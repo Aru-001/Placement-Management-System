@@ -1,0 +1,83 @@
+import express from "express";
+import { authMiddleware } from "../../middlewares/auth/middleware.js";
+import { isStudent } from "../../middlewares/role/middleware.js";
+import {
+  applyForJob,
+  createStudentProfile,
+  deleteStudentProfile,
+  getApplicationDetails,
+  getAvailaibleJobs,
+  getMyApplication,
+  getStudentProfile,
+  updateStudentProfile,
+  uploadResume,
+  uploadProfilePicture,
+  getStudentDashboard,
+  getJobDetails,
+  getApplicationStatus,
+  getRecommendedJobs,
+} from "../../controllers/student/studentController.js";
+import upload from "../../middlewares/upload/multer.js";
+import imageUpload from "../../middlewares/upload/imageUpload.js";
+
+const router = express.Router();
+
+// router.get("/resume/preview", proxyResumePreview);
+
+router.get("/dashboard", authMiddleware, isStudent, getStudentDashboard);
+
+/* ===============================
+   Student Profile CRUD
+================================= */
+
+// CREATE Profile
+router.post("/profile", authMiddleware, isStudent, createStudentProfile);
+
+// GET My Profile
+router.get("/profile", authMiddleware, isStudent, getStudentProfile);
+
+// UPDATE My Profile
+router.put("/profile", authMiddleware, isStudent, updateStudentProfile);
+
+// DELETE My Profile (optional but clean)
+router.delete("/profile", authMiddleware, isStudent, deleteStudentProfile);
+
+router.post(
+  "/upload-resume",
+  authMiddleware,
+  isStudent,
+  upload.single("resume"),
+  uploadResume,
+);
+
+router.post(
+  "/upload-profile-picture",
+  authMiddleware,
+  isStudent,
+  imageUpload.single("profilePicture"),
+  uploadProfilePicture,
+);
+
+router.get("/jobs", authMiddleware, isStudent, getAvailaibleJobs);
+
+router.post("/apply/:jobId", authMiddleware, isStudent, applyForJob);
+
+router.get("/jobs/:jobId", authMiddleware, isStudent, getJobDetails);
+
+router.get("/applications", authMiddleware, isStudent, getMyApplication);
+router.get(
+  "/jobs/:jobId/application-status",
+  authMiddleware,
+  isStudent,
+  getApplicationStatus,
+);
+
+router.get(
+  "/applications/:applicationId",
+  authMiddleware,
+  isStudent,
+  getApplicationDetails,
+);
+
+router.get("/recommended-jobs", authMiddleware, isStudent, getRecommendedJobs);
+export default router;
